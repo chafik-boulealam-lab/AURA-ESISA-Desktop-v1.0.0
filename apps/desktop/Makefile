@@ -31,7 +31,10 @@ SRCS = src/main.c \
 
 OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-ifneq ($(wildcard C:/msys64/mingw64/bin/gcc.exe),)
+ifneq ($(MSYSTEM),)
+MKDIR_CMD = mkdir -p "$(1)"
+RM_CMD = rm -rf "$(1)"
+else ifneq ($(wildcard C:/msys64/mingw64/bin/gcc.exe),)
 MKDIR_CMD = mkdir -p "$(1)"
 RM_CMD = rm -rf "$(1)"
 else ifeq ($(OS),Windows_NT)
