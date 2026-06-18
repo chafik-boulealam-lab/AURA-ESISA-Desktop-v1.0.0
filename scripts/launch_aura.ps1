@@ -10,10 +10,10 @@ $script:RequiredDlls = @(
 )
 
 function Resolve-AuraAppDir {
-    $root = $PSScriptRoot
+    $root = Split-Path $PSScriptRoot -Parent
     $candidates = @(
-        (Join-Path $root "bin\bin"),
-        (Join-Path $root "bin")
+        (Join-Path $root "dist\bin"),
+        (Join-Path $root "apps\desktop\bin")
     )
     foreach ($dir in $candidates) {
         if (Test-Path (Join-Path $dir "AURA.exe")) {

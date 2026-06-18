@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/api.h"
-#include "../include/evaluation.h"
+#include "api.h"
+#include "evaluation.h"
 
 static int tests_run = 0;
 static int tests_failed = 0;

@@ -1,47 +1,36 @@
 # Secrets — ne jamais committer
-bin/bin/config/aura.cfg
 config/aura.cfg
+dist/bin/config/aura.cfg
 .env
 *.log
 
-# Build
-obj/
-bin/AURA.exe
-bin/bin/AURA.exe
-bin/bin/*.dll
-bin/bin/lib*.dll
-tests/test_api.exe
-tests/qb_test.exe
+# Build desktop
+apps/desktop/obj/
+apps/desktop/bin/
+apps/desktop/tests/test_api.exe
+apps/desktop/tests/qb_test.exe
 
-# Backend binaires
-backend/server.exe
-backend/data/app.db
+# Distribution runtime (genere par build.ps1)
+dist/
 
-# Données locales utilisateur
+# Web server binaires
+apps/web/server/server.exe
+apps/web/server/data/app.db
+
+# Donnees locales utilisateur
 data/local.db
 data/reports/
-bin/bin/data/local.db
-bin/bin/data/reports/
 
 # Archives / binaires packagés
 *.zip
 AURA-ESISA/
 test_*.exe
 test_*.txt
-test_gtk.c
-test_minimal.c
-Untitled*.c
 aura_*.log
 aura_run_*.txt
 login_screen_debug.log
 runlog.txt
 run_utf8.log
-
-# Artefacts generes (sources versionnees a la racine)
-bin/bin/AURA.bat
-bin/bin/Lancer_AURA.bat
-bin/bin/cacert.pem
-bin/bin/assets/
 
 # OS
 Thumbs.db

@@ -68,7 +68,6 @@ static gboolean dashboard_button_enter_cb(GtkWidget *widget, GdkEventCrossing *e
     if (widget != NULL) {
         GdkDisplay *display = gtk_widget_get_display(widget);
         if (display != NULL) {
-            gdk_display_beep(display);
             if (gtk_widget_get_realized(widget)) {
                 GdkWindow *gdk_window = gtk_widget_get_window(widget);
                 if (gdk_window != NULL) {

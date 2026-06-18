@@ -1,6 +1,9 @@
+$ProjectRoot = Split-Path $PSScriptRoot -Parent
 $src = "C:\msys64\mingw64\bin"
-$dest = Join-Path $PSScriptRoot "bin\bin"
-if (-not (Test-Path $dest)) { $dest = Join-Path $PSScriptRoot "bin" }
+$dest = Join-Path $ProjectRoot "dist\bin"
+if (-not (Test-Path $dest)) {
+    $dest = Join-Path $ProjectRoot "apps\desktop\bin"
+}
 
 $dlls = @(
     "libatk-1.0-0.dll","libcairo-2.dll","libcairo-gobject-2.dll","libcjson-1.dll","libcurl-4.dll",

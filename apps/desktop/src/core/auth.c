@@ -1,5 +1,5 @@
-#include "../include/auth.h"
-#include "../include/db.h"
+#include "auth.h"
+#include "db.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

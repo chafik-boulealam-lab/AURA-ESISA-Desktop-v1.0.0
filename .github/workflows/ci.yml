@@ -28,13 +28,11 @@ jobs:
             mingw-w64-x86_64-sqlite3
             mingw-w64-x86_64-cjson
 
-      - name: Build application
-        run: mingw32-make all
+      - name: Build desktop application
+        run: mingw32-make -C apps/desktop all
 
       - name: Run unit tests
-        run: |
-          cd tests
-          mingw32-make test
+        run: mingw32-make -C apps/desktop/tests test
 
       - name: Verify executable
-        run: test -f bin/AURA.exe
+        run: test -f apps/desktop/bin/AURA.exe

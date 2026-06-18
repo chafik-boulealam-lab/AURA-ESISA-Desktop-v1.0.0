@@ -11,11 +11,11 @@ if defined AURA_DEBUG if /I "!AURA_DEBUG!"=="1" set "DEBUG_MODE=1"
 set "SCRIPT_DIR=%~dp0"
 set "APP_DIR=%SCRIPT_DIR%"
 
-if exist "%SCRIPT_DIR%bin\bin\AURA.exe" (
-    set "APP_DIR=%SCRIPT_DIR%bin\bin"
+if exist "%SCRIPT_DIR%dist\bin\AURA.exe" (
+    set "APP_DIR=%SCRIPT_DIR%dist\bin"
 ) else if not exist "%APP_DIR%\AURA.exe" (
-    if exist "%SCRIPT_DIR%bin\AURA.exe" (
-        set "APP_DIR=%SCRIPT_DIR%bin"
+    if exist "%SCRIPT_DIR%apps\desktop\bin\AURA.exe" (
+        set "APP_DIR=%SCRIPT_DIR%apps\desktop\bin"
     )
 )
 
@@ -35,7 +35,7 @@ echo.
 
 if not exist "%APP_DIR%\AURA.exe" (
     echo [ERREUR] AURA.exe introuvable.
-    echo Lancez build.ps1 depuis le dossier PFA.
+    echo Lancez scripts\build.ps1 depuis le dossier PFA.
     echo.
     pause
     exit /b 1
@@ -49,7 +49,7 @@ for %%D in (libgtk-3-0.dll libglib-2.0-0.dll libcurl-4.dll) do (
     )
 )
 if "!DLL_OK!"=="0" (
-    echo Relancez build.ps1 ou package_dlls.ps1.
+    echo Relancez scripts\build.ps1 ou scripts\package_dlls.ps1.
     echo.
     pause
     exit /b 1

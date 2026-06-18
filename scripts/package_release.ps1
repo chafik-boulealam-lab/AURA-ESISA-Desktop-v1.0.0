@@ -4,12 +4,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
-$binDir = Join-Path $root "bin\bin"
+$binDir = Join-Path $root "dist\bin"
 $releaseDir = Join-Path $root $OutputName
 
 if (-not (Test-Path (Join-Path $binDir "AURA.exe"))) {
     Write-Host "Build manquant - lancement de build.ps1..."
-    & (Join-Path $root "build.ps1")
+    & (Join-Path $root "scripts\build.ps1")
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
