@@ -129,6 +129,7 @@ Projet publie sous l'organisation GitHub: chafik-boulealam-lab
 
 ## License
 Academic project developed at ESISA for the End-of-Semester C Project. Not licensed for commercial use.
+See LICENSE for full terms.
 
 ## Acknowledgments
 - ESISA - Ecole Superieure d'Ingenierie en Sciences Appliquees
