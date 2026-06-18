@@ -1,111 +1,150 @@
-# AURA — ESISA Interview Simulator (PFA)
+# AURA - ESISA Interview Simulator (PFA)
 
-Simulateur d'entretiens techniques desktop pour la formation ESISA.  
-**Matières :** Architecture des ordinateurs, Algorithmique, Programmation C.  
-**Stack :** C, GTK3, SQLite, Groq API (`llama-3.1-8b-instant`), libcurl, cJSON.
+## Overview
+AURA is a desktop interview simulator built for ESISA training. It helps students practice technical interviews across three subjects with AI-assisted evaluation and local performance tracking.
 
-## Structure du projet
+Covered subjects:
+- Architecture des ordinateurs
+- Algorithmique
+- Programmation C
 
-```
-PFA/
-├── apps/
-│   ├── desktop/              # Application GTK principale (production)
-│   │   ├── src/
-│   │   │   ├── ui/           # login_ui, dashboard_ui, startup
-│   │   │   ├── core/         # interview, api, db, auth, questions...
-│   │   │   ├── infra/        # launcher, filesystem, config, assets
-│   │   │   └── legacy/       # stubs non compiles
-│   │   ├── include/{ui,core,infra}/
-│   │   └── tests/
-│   └── web/                  # Prototype HTTP (independant du desktop)
-│       ├── server/           # API REST C (port 8080)
-│       └── client/           # Frontend HTML/JS
-├── assets/                   # Images, sons, fonts
-├── config/                   # aura.cfg (gitignore)
-├── data/                     # questions.csv, local.db
-├── dist/bin/                 # Runtime apres build (exe + DLLs)
-├── docs/                     # Documentation
-├── scripts/                  # build.ps1, package_release.ps1, launchers
-├── AURA.bat                  # Lanceur principal (double-clic)
-└── Makefile                  # Orchestrateur (delegue a apps/desktop)
+## Features
+- Desktop GTK interface (login, dashboard, interview flow)
+- AI feedback and scoring via Groq API
+- Local fallback evaluation when AI is unavailable
+- SQLite persistence for users, sessions, scores, and reports
+- Question bank from CSV + anti-repetition logic
+- Session report export (PDF/TXT fallback)
+- Packaged Windows release with launcher and runtime DLLs
+
+## Demo Flow
+```text
+1) User logs in
+2) User starts interview (domain + level)
+3) AURA asks questions (bank + optional AI)
+4) User answers
+5) AURA evaluates answers and computes score
+6) Dashboard displays stats + generated report
 ```
 
-## Demarrage rapide (Windows)
+## Tech Stack
+| Layer | Technology |
+|---|---|
+| Language | C |
+| Desktop UI | GTK3 |
+| HTTP | libcurl |
+| JSON | cJSON |
+| Database | SQLite3 |
+| AI | Groq API (llama-3.1-8b-instant) |
+| Build | Make + GCC + PowerShell scripts |
 
-### Prerequis (MSYS2 MinGW64)
+## Architecture
+The project is organized around a production desktop app and an optional web prototype.
+
+```text
+[ Desktop App ]
+apps/desktop/src/main.c
+  -> ui/       (login_ui, dashboard_ui, startup)
+  -> core/     (interview, evaluation, api, db, auth, report, questions)
+  -> infra/    (filesystem, config, launcher, assets)
+
+[ Web Prototype (optional) ]
+apps/web/client
+apps/web/server
+```
+
+Data flow:
+```text
+User answer -> AI request (libcurl) -> JSON parse (cJSON)
+          -> verdict + score -> store in SQLite -> dashboard/report
+```
+
+## Prerequisites
+Windows (MSYS2 MinGW64):
 
 ```bash
 pacman -S --noconfirm mingw-w64-x86_64-gtk3 mingw-w64-x86_64-pkg-config \
   mingw-w64-x86_64-curl mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-gcc make
 ```
 
-### Configuration API Groq
+## Setup
+Set your API key (recommended via environment variable):
 
-Creez `config/aura.cfg` :
+```powershell
+$env:AURA_API_KEY="your_key_here"
+```
+
+Or use config file:
 
 ```ini
+config/aura.cfg
 groq_api_key=votre_cle_groq
 ```
 
-### Build & lancement
-
+## Build
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\build.ps1
 ```
 
-Puis double-cliquez **`AURA.bat`**
+## Usage
+Launch:
 
-Debug console :
+```bat
+AURA.bat
+```
+
+Debug mode:
 
 ```bat
 AURA.bat /debug
 ```
 
-PowerShell :
+PowerShell launcher:
 
 ```powershell
 .\scripts\launch_aura.ps1
 .\scripts\launch_aura.ps1 -Debug
 ```
 
-## Release
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\package_release.ps1
-```
-
-Produit `AURA-ESISA.zip` pret a partager.
-
 ## Tests
-
 ```bash
 mingw32-make -C apps/desktop/tests test
 ```
 
-## Prototype web (optionnel)
+## Release Packaging
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\package_release.ps1
+```
 
-```bash
-mingw32-make -C apps/web/server all
-# Ouvrir apps/web/client/index.html avec le serveur sur :8080
+Output:
+- AURA-ESISA/
+- AURA-ESISA.zip
+
+## Project Structure
+```text
+aura/
+|- apps/
+|  |- desktop/   # production app
+|  |- web/       # optional prototype
+|- assets/
+|- config/
+|- data/
+|- docs/
+|- scripts/
+|- AURA.bat
+|- Makefile
 ```
 
 ## Documentation
-
 - [Guide simulateur](docs/SIMULATOR_GUIDE.md)
 - [Soutenance](docs/SOUTENANCE.md)
 - [Architecture](docs/ARCHITECTURE.md)
-- [Release](docs/RELEASE_INSTRUCTIONS.md)
-
-## Licence
-
-Projet academique ESISA — usage educatif.
+- [Release instructions](docs/RELEASE_INSTRUCTIONS.md)
 
 ## Organisation
-
-Ce projet est publie sous l'organisation GitHub chafik-boulealam-lab.
+Published under GitHub organization: chafik-boulealam-lab
 
 ## Team
-
 - Laarichi Ayoub
   - LinkedIn: https://www.linkedin.com/in/ayoub-laarichi-833425361
 - Chiboub Taha Adnane
@@ -115,11 +154,9 @@ Ce projet est publie sous l'organisation GitHub chafik-boulealam-lab.
   - LinkedIn: https://www.linkedin.com/in/abdelaziz-khoungui-428355397/
 
 ## License
-
 Academic project developed at ESISA for the End-of-Semester C Project. Not licensed for commercial use.
 
 ## Acknowledgments
-
-- ESISA — Ecole Superieure d'Ingenierie en Sciences Appliquees
-- Prof. Mehdi Iraqi Houssaini — Course instructor
-- Prof. Chafik Boulealam — Project supervision
+- ESISA - Ecole Superieure d'Ingenierie en Sciences Appliquees
+- Prof. Mehdi Iraqi Houssaini - Course instructor
+- Prof. Chafik Boulealam - Project supervision
