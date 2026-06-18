@@ -99,3 +99,27 @@ mingw32-make -C apps/web/server all
 ## Licence
 
 Projet academique ESISA — usage educatif.
+
+## Organisation
+
+Ce projet est publie sous l'organisation GitHub chafik-boulealam-lab.
+
+## Team
+
+- Laarichi Ayoub
+  - Email: a.laarichi@esisa.ac.ma
+  - LinkedIn: https://www.linkedin.com/in/ayoub-laarichi-833425361
+- Chiboub Taha Adnane
+  - LinkedIn: https://www.linkedin.com/in/taha-adnane-chiboub-1a5ab939a/
+- Abdleziz Khoungi
+  - Email: a.khoungi@esisa.ac.ma
+
+## License
+
+Academic project developed at ESISA for the End-of-Semester C Project. Not licensed for commercial use.
+
+## Acknowledgments
+
+- ESISA — Ecole Superieure d'Ingenierie en Sciences Appliquees
+- Prof. Mehdi Iraqi Houssaini — Course instructor
+- Prof. Chafik Boulealam — Project supervision
