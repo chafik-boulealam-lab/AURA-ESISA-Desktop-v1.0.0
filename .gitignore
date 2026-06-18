@@ -14,6 +14,7 @@ apps/desktop/tests/qb_test.exe
 dist/
 
 # Web server binaires
+apps/web/server/obj/
 apps/web/server/server.exe
 apps/web/server/data/app.db
 
