@@ -107,12 +107,12 @@ Ce projet est publie sous l'organisation GitHub chafik-boulealam-lab.
 ## Team
 
 - Laarichi Ayoub
-  - Email: a.laarichi@esisa.ac.ma
   - LinkedIn: https://www.linkedin.com/in/ayoub-laarichi-833425361
 - Chiboub Taha Adnane
   - LinkedIn: https://www.linkedin.com/in/taha-adnane-chiboub-1a5ab939a/
 - Abdleziz Khoungi
   - Email: a.khoungi@esisa.ac.ma
+  - LinkedIn: https://www.linkedin.com/in/abdelaziz-khoungui-428355397/
 
 ## License
 
