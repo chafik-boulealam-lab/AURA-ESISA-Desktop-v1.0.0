@@ -29,52 +29,52 @@ Covered subjects:
 
 ## Tech Stack
 | Layer | Technology |
-|---|---|
-| Language | C |
-| Desktop UI | GTK3 |
-| HTTP | libcurl |
-| JSON | cJSON |
-| Database | SQLite3 |
-| AI | Groq API (llama-3.1-8b-instant) |
-| Build | Make + GCC + PowerShell scripts |
+# AURA - ESISA Interview Simulator (PFA)
 
-## Architecture
-The project is organized around a production desktop app and an optional web prototype.
+Simulateur desktop d'entretiens techniques pour les etudiants ESISA.
 
+Matieres couvertes:
+- Architecture des ordinateurs
+- Algorithmique
+- Programmation C
+
+## Fonctionnalites
+- Interface desktop GTK (connexion, tableau de bord, session d'entretien)
+- Evaluation des reponses avec Groq API
+- Evaluation locale de secours si l'API est indisponible
+- Sauvegarde locale avec SQLite (sessions, scores, rapports)
+- Banque de questions CSV avec mecanisme anti-repetition
+- Export de rapport de session (PDF avec fallback TXT)
+
+## Structure du projet
 ```text
-[ Desktop App ]
-apps/desktop/src/main.c
-  -> ui/       (login_ui, dashboard_ui, startup)
-  -> core/     (interview, evaluation, api, db, auth, report, questions)
-  -> infra/    (filesystem, config, launcher, assets)
-
-[ Web Prototype (optional) ]
-apps/web/client
-apps/web/server
+aura/
+|- apps/
+|  |- desktop/   # application principale
+|  |- web/       # prototype optionnel
+|- assets/
+|- config/
+|- data/
+|- docs/
+|- scripts/
+|- AURA.bat
+|- Makefile
 ```
 
-Data flow:
-```text
-User answer -> AI request (libcurl) -> JSON parse (cJSON)
-          -> verdict + score -> store in SQLite -> dashboard/report
-```
-
-## Prerequisites
-Windows (MSYS2 MinGW64):
-
+## Prerequis (Windows / MSYS2 MinGW64)
 ```bash
 pacman -S --noconfirm mingw-w64-x86_64-gtk3 mingw-w64-x86_64-pkg-config \
   mingw-w64-x86_64-curl mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-gcc make
 ```
 
-## Setup
-Set your API key (recommended via environment variable):
+## Configuration API
+Option recommandee (variable d'environnement):
 
 ```powershell
 $env:AURA_API_KEY="your_key_here"
 ```
 
-Or use config file:
+Option fichier config:
 
 ```ini
 config/aura.cfg
@@ -86,24 +86,15 @@ groq_api_key=votre_cle_groq
 powershell -ExecutionPolicy Bypass -File scripts\build.ps1
 ```
 
-## Usage
-Launch:
-
+## Lancement
 ```bat
 AURA.bat
 ```
 
-Debug mode:
+Mode debug:
 
 ```bat
 AURA.bat /debug
-```
-
-PowerShell launcher:
-
-```powershell
-.\scripts\launch_aura.ps1
-.\scripts\launch_aura.ps1 -Debug
 ```
 
 ## Tests
@@ -111,38 +102,22 @@ PowerShell launcher:
 mingw32-make -C apps/desktop/tests test
 ```
 
-## Release Packaging
+## Packaging release
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\package_release.ps1
 ```
 
-Output:
+Sortie:
 - AURA-ESISA/
 - AURA-ESISA.zip
 
-## Project Structure
-```text
-aura/
-|- apps/
-|  |- desktop/   # production app
-|  |- web/       # optional prototype
-|- assets/
-|- config/
-|- data/
-|- docs/
-|- scripts/
-|- AURA.bat
-|- Makefile
-```
-
 ## Documentation
 - [Guide simulateur](docs/SIMULATOR_GUIDE.md)
-- [Soutenance](docs/SOUTENANCE.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Release instructions](docs/RELEASE_INSTRUCTIONS.md)
 
 ## Organisation
-Published under GitHub organization: chafik-boulealam-lab
+Projet publie sous l'organisation GitHub: chafik-boulealam-lab
 
 ## Team
 - Laarichi Ayoub
@@ -150,7 +125,6 @@ Published under GitHub organization: chafik-boulealam-lab
 - Chiboub Taha Adnane
   - LinkedIn: https://www.linkedin.com/in/taha-adnane-chiboub-1a5ab939a/
 - Abdleziz Khoungi
-  - Email: a.khoungi@esisa.ac.ma
   - LinkedIn: https://www.linkedin.com/in/abdelaziz-khoungui-428355397/
 
 ## License
