@@ -7,6 +7,16 @@ CC := gcc
 PKG_CONFIG := pkg-config
 endif
 
+ifeq ($(OS),Windows_NT)
+ifneq ($(MSYSTEM),)
+# Keep MSYS-provided shell.
+else ifneq ($(wildcard C:/msys64/mingw64/bin/gcc.exe),)
+# Bash is already set above.
+else
+SHELL := cmd
+endif
+endif
+
 INC_UI = include/ui
 INC_CORE = include/core
 INC_INFRA = include/infra

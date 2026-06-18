@@ -1,9 +1,17 @@
-SHELL := cmd
-
 ifneq ($(wildcard C:/msys64/mingw64/bin/gcc.exe),)
 CC ?= C:/msys64/mingw64/bin/gcc
 else
 CC ?= gcc
+endif
+
+ifeq ($(OS),Windows_NT)
+ifneq ($(MSYSTEM),)
+# Keep MSYS-provided shell.
+else ifneq ($(wildcard C:/msys64/mingw64/bin/gcc.exe),)
+# Use Make default shell when MinGW/MSYS toolchain is detected.
+else
+SHELL := cmd
+endif
 endif
 
 ifneq ($(wildcard C:/msys64/mingw64/bin/pkg-config.exe),)
@@ -22,7 +30,15 @@ TARGET = server
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-ifeq ($(OS),Windows_NT)
+ifneq ($(MSYSTEM),)
+MKDIR_CMD = mkdir -p "$(1)"
+RM_FILE_CMD = rm -f "$(1)"
+RM_DIR_CMD = rm -rf "$(1)"
+else ifneq ($(wildcard C:/msys64/mingw64/bin/gcc.exe),)
+MKDIR_CMD = mkdir -p "$(1)"
+RM_FILE_CMD = rm -f "$(1)"
+RM_DIR_CMD = rm -rf "$(1)"
+else ifeq ($(OS),Windows_NT)
 MKDIR_CMD = if not exist "$(1)" mkdir "$(1)"
 RM_FILE_CMD = if exist "$(1)" del /Q "$(1)"
 RM_DIR_CMD = if exist "$(1)" rmdir /S /Q "$(1)"
