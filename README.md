@@ -41,7 +41,21 @@ cd C:\Users\ok\Downloads\PFA
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
-Puis double-cliquez : **`bin\bin\Lancer_AURA.bat`**
+Puis double-cliquez : **`AURA.bat`** (racine du projet)
+
+En cas de probleme :
+
+```bat
+AURA.bat /debug
+REM ou Lancer_AURA.bat (equivalent)
+```
+
+PowerShell (memes verifications) :
+
+```powershell
+.\launch_aura.ps1          # GUI
+.\launch_aura.ps1 -Debug   # console
+```
 
 ## Parcours utilisateur
 
@@ -64,6 +78,15 @@ PFA/
 ├── tests/         # Tests API
 └── build.ps1      # Script de build Windows
 ```
+
+## Release (distribution)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+powershell -ExecutionPolicy Bypass -File scripts\package_release.ps1
+```
+
+Produit `AURA-ESISA.zip` pret a partager.
 
 ## Tests
 

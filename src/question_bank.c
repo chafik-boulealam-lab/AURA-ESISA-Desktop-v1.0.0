@@ -107,6 +107,9 @@ static void seed_all_if_needed(sqlite3 *db) {
 }
 
 bool qb_init(void) {
+    static bool initialized = false;
+    if (initialized) return true;
+
     sqlite3 *db = NULL;
     if (!qb_open_db(&db)) {
         fprintf(stderr, "[QB] Cannot open database\n");
@@ -115,6 +118,7 @@ bool qb_init(void) {
     seed_all_if_needed(db);
     printf("[QB] Question bank ready\n");
     sqlite3_close(db);
+    initialized = true;
     return true;
 }
 

@@ -5,6 +5,15 @@
 #include "login_ui.h"
 #include "session.h"
 #include "auth.h"
+#include "filesystem.h"
+#include "aura_theme.h"
+
+static FILE *login_debug_open(void) {
+    char path[1024];
+    if (aura_fs_get_data_path("login_screen_debug.log", path, sizeof(path)))
+        return fopen(path, "a");
+    return fopen("login_screen_debug.log", "a");
+}
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -205,122 +214,96 @@ static void pulse_button(GtkWidget *widget) {
 static void apply_login_css(void) {
     GtkCssProvider *provider = gtk_css_provider_new();
     const gchar *css =
-        "* { font-family: 'Segoe UI', 'Inter', sans-serif; }"
-        "window.aura-login-window { background-color: #12101A; color: #F5F0E8; }"
-        "label { color: #D4C8E8; }"
-        "entry { background-color: rgba(26, 22, 40, 0.95); color: #F5F0E8; border: 2px solid rgba(124, 108, 240, 0.25); border-radius: 12px; padding: 12px; }"
-        "entry:focus { border-color: #E8A838; }"
-        "textview { background-color: rgba(26, 22, 40, 0.95); color: #F5F0E8; }"
-        "textview text { background-color: rgba(26, 22, 40, 0.95); color: #F5F0E8; }"
-        "checkbutton label { color: #A89BB8; }"
-        ".login-root { background-color: transparent; }"
-        ".login-panel { background-color: transparent; }"
-        ".neon-frame {"
-        "  background-color: rgba(30, 26, 46, 0.55);"
-        "  border: 1px solid rgba(232, 168, 56, 0.22);"
-        "  border-radius: 20px;"
-        "}"
-        ".logo-shell { background-color: transparent; }"
-        ".login-title { color: #F5F0E8; font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 16px; }"
-        ".login-subtitle { color: #A89BB8; font-size: 14px; font-weight: 400; }"
-        ".typing-label { color: #E8A838; font-size: 13px; font-weight: 600; margin-top: 16px; }"
-        ".status-label { color: #7C6CF0; font-size: 12px; font-weight: 600; }"
-        ".field-label { color: #D4C8E8; font-size: 12px; font-weight: 800; letter-spacing: 1.2px; margin-bottom: 8px; }"
+        AURA_CSS_BASE
+        "window.aura-login-window { background-color: #0A0812; color: #FAF7F2; }"
+        "label { color: #D8CEE8; }"
+        "entry { background-color: rgba(20, 16, 31, 0.95); color: #FAF7F2; border: 1px solid rgba(139, 124, 246, 0.22); border-radius: 10px; padding: 14px; }"
+        "entry:focus { border-color: #F0B429; }"
+        "checkbutton label { color: #9A8FAE; }"
+        ".login-subtitle { color: #9A8FAE; font-size: 14px; }"
+        ".typing-label { color: #F0B429; font-size: 13px; font-weight: 600; margin-top: 16px; }"
+        ".status-label { color: #8B7CF6; font-size: 12px; font-weight: 600; }"
+        ".field-label { color: #D8CEE8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; }"
         ".login-entry, .name-entry {"
-        "  background-color: rgba(26, 22, 40, 0.95);"
-        "  color: #F5F0E8;"
-        "  border: 2px solid rgba(124, 108, 240, 0.25);"
-        "  border-radius: 12px;"
+        "  background-color: rgba(20, 16, 31, 0.95);"
+        "  color: #FAF7F2;"
+        "  border: 1px solid rgba(139, 124, 246, 0.22);"
+        "  border-radius: 10px;"
         "  padding: 16px;"
         "  font-size: 14px;"
         "}"
-        ".login-entry:focus, .name-entry:focus {"
-        "  border-color: #E8A838;"
-        "  box-shadow: 0 0 0 3px rgba(232, 168, 56, 0.15);"
-        "}"
-        "button { background-image: none; box-shadow: none; }"
+        ".login-entry:focus, .name-entry:focus { border-color: #F0B429; }"
         "button.login-button, .login-button {"
-        "  background-image: linear-gradient(135deg, #E8A838 0%, #D4922A 100%);"
-        "  background-color: #E8A838;"
+        "  background-image: linear-gradient(135deg, #F0B429 0%, #C4922A 100%);"
+        "  background-color: #F0B429;"
         "  color: #1A1208;"
         "  border: none;"
-        "  border-radius: 12px;"
+        "  border-radius: 10px;"
         "  padding: 14px 20px;"
         "  font-size: 15px;"
         "  font-weight: 800;"
-        "  box-shadow: 0 8px 20px rgba(232, 168, 56, 0.3);"
+        "  box-shadow: 0 8px 24px rgba(240, 180, 41, 0.28);"
         "}"
         "button.login-button label, .login-button label { color: #1A1208; font-weight: 800; }"
-        ".login-button:hover { background-image: linear-gradient(135deg, #F0B84A 0%, #E8A838 100%); }"
+        ".login-button:hover { background-image: linear-gradient(135deg, #F8C84A 0%, #F0B429 100%); }"
         "button.signup-button, .signup-button {"
-        "  background-image: none;"
-        "  background-color: rgba(124, 108, 240, 0.22);"
-        "  color: #F5F0E8;"
-        "  border: 2px solid rgba(124, 108, 240, 0.45);"
-        "  border-radius: 12px;"
+        "  background-color: rgba(139, 124, 246, 0.15);"
+        "  color: #FAF7F2;"
+        "  border: 1px solid rgba(139, 124, 246, 0.35);"
+        "  border-radius: 10px;"
         "  padding: 14px 20px;"
         "  font-size: 15px;"
         "  font-weight: 800;"
         "}"
-        "button.signup-button label, .signup-button label { color: #F5F0E8; }"
-        ".signup-button:hover { background-color: rgba(124, 108, 240, 0.35); border-color: rgba(124, 108, 240, 0.65); }"
+        "button.signup-button label, .signup-button label { color: #FAF7F2; }"
+        ".signup-button:hover { background-color: rgba(139, 124, 246, 0.28); }"
         "button.exit-button, .exit-button {"
-        "  background-image: none;"
-        "  background-color: rgba(180, 60, 80, 0.2);"
-        "  color: #F5D0D8;"
-        "  border: 1px solid rgba(220, 100, 120, 0.4);"
+        "  background-color: rgba(248, 113, 113, 0.1);"
+        "  color: #FCA5A5;"
+        "  border: 1px solid rgba(248, 113, 113, 0.25);"
         "  border-radius: 10px;"
         "  padding: 12px 20px;"
         "  font-weight: 700;"
         "}"
-        "button.exit-button label, .exit-button label { color: #F5D0D8; }"
-        ".exit-button:hover { background-color: rgba(180, 60, 80, 0.32); }"
+        "button.exit-button label, .exit-button label { color: #FCA5A5; }"
         "button.forgot-button, .forgot-button {"
-        "  background-image: none;"
-        "  background-color: rgba(42, 37, 64, 0.95);"
-        "  color: #E8A838;"
-        "  border: 1px solid rgba(232, 168, 56, 0.35);"
-        "  border-radius: 10px;"
-        "  padding: 9px 14px;"
-        "  font-size: 12px;"
+        "  background-color: rgba(30, 24, 40, 0.8);"
+        "  color: #F0B429;"
+        "  border: 1px solid rgba(240, 180, 41, 0.25);"
+        "  border-radius: 8px;"
+        "  padding: 8px 12px;"
+        "  font-size: 11px;"
         "  font-weight: 700;"
-        "  box-shadow: none;"
         "}"
-        "button.forgot-button label, .forgot-button label { color: #E8A838; font-weight: 700; }"
-        ".forgot-button:hover { background-color: rgba(232, 168, 56, 0.18); color: #FFF8EC; }"
-        ".forgot-button:hover label { color: #FFF8EC; }"
-        ".remember-check { color: #A89BB8; font-size: 12px; font-weight: 600; }"
-        ".divider-label { color: #E8A838; font-size: 11px; font-weight: 700; letter-spacing: 1px; }"
+        "button.forgot-button label, .forgot-button label { color: #F0B429; }"
+        ".remember-check { color: #9A8FAE; font-size: 12px; font-weight: 600; }"
+        ".divider-label { color: #6E6478; font-size: 11px; font-weight: 700; letter-spacing: 2px; }"
         ".stage-shell {"
-        "  background-color: rgba(26, 22, 40, 0.4);"
-        "  border: 1px solid rgba(232, 168, 56, 0.12);"
-        "  border-radius: 30px;"
-        "  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);"
-        "}"
-        ".auth-stack { background-color: transparent; }"
-        ".panel-card {"
-        "  background-color: rgba(30, 26, 46, 0.88);"
-        "  border: 1px solid rgba(124, 108, 240, 0.22);"
+        "  background-color: rgba(20, 16, 31, 0.35);"
+        "  border: 1px solid rgba(240, 180, 41, 0.1);"
         "  border-radius: 28px;"
-        "  padding: 28px;"
-        "  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);"
+        "  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.45);"
         "}"
-        ".feedback-label { color: #D4C8E8; font-size: 12px; font-weight: 700; min-height: 24px; }"
-        ".feedback-success { color: #4ADE80; }"
-        ".feedback-error { color: #F87171; background-color: rgba(248, 113, 113, 0.08); padding: 4px 6px; border-radius: 6px; }"
+        ".panel-card {"
+        "  background-color: rgba(30, 24, 40, 0.82);"
+        "  border: 1px solid rgba(139, 124, 246, 0.16);"
+        "  border-radius: 22px;"
+        "  padding: 32px;"
+        "  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.38);"
+        "}"
+        ".feedback-label { color: #D8CEE8; font-size: 12px; font-weight: 700; min-height: 24px; }"
+        ".feedback-success { color: #34D399; }"
+        ".feedback-error { color: #F87171; }"
         ".return-button {"
-        "  background-color: rgba(42, 37, 64, 0.8);"
-        "  color: #D4C8E8;"
-        "  border: 1px solid rgba(124, 108, 240, 0.25);"
-        "  border-radius: 12px;"
+        "  background-color: rgba(30, 24, 40, 0.8);"
+        "  color: #D8CEE8;"
+        "  border: 1px solid rgba(139, 124, 246, 0.2);"
+        "  border-radius: 10px;"
         "  padding: 14px 20px;"
         "  font-weight: 700;"
         "}"
-        ".return-button:hover { background-color: rgba(124, 108, 240, 0.2); color: #FFFFFF; }"
-        ".stack-link-button { background-color: transparent; color: #8B7FA0; border: none; font-size: 12px; font-weight: 700; }"
-        ".stack-link-button:hover { color: #E8A838; }"
-        "progressbar trough { background-color: rgba(42, 37, 64, 0.8); border-radius: 999px; }"
-        "progressbar progress { background-image: linear-gradient(90deg, #E8A838 0%, #7C6CF0 100%); border-radius: 999px; }"
+        ".return-button:hover { background-color: rgba(139, 124, 246, 0.18); }"
+        ".button-pulse { box-shadow: 0 0 0 4px rgba(240, 180, 41, 0.35); }"
     ;
 
     gtk_css_provider_load_from_data(provider, css, -1, NULL);
@@ -365,15 +348,14 @@ static void draw_particle_glow(cairo_t *cr, gdouble x, gdouble y, gdouble radius
 static void draw_scanner_lines(cairo_t *cr, gint width, gint height, guint phase) {
     gdouble scan_y = (phase % 200) * (height / 200.0);
     
-    // Main scan line (bright cyan)
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.4);
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.28);
     cairo_set_line_width(cr, 1.5);
     cairo_move_to(cr, 0, scan_y);
     cairo_line_to(cr, width, scan_y);
     cairo_stroke(cr);
     
     // Glow effect above scan line
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.15);
+    cairo_set_source_rgba(cr, 0.55, 0.49, 0.96, 0.12);
     cairo_set_line_width(cr, 8.0);
     cairo_move_to(cr, 0, scan_y - 20);
     cairo_line_to(cr, width, scan_y - 20);
@@ -382,7 +364,7 @@ static void draw_scanner_lines(cairo_t *cr, gint width, gint height, guint phase
     // Fading lines below (interference effect)
     for (int i = 1; i <= 3; i++) {
         gdouble fade_alpha = 0.08 / i;
-        cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, fade_alpha);
+        cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, fade_alpha);
         cairo_set_line_width(cr, 1.0);
         cairo_move_to(cr, 0, scan_y + (i * 8));
         cairo_line_to(cr, width, scan_y + (i * 8));
@@ -401,12 +383,11 @@ static void draw_neural_indicators(cairo_t *cr, gint width, gint height, guint p
         gdouble node_size = 3.0 + (indicator_pulse * 2.0);
         
         // Outer glow
-        cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.3 * indicator_pulse);
+        cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.28 * indicator_pulse);
         cairo_arc(cr, x, y, node_size * 1.8, 0, 6.283185307179586);
         cairo_fill(cr);
         
-        // Inner node
-        cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.7 + (indicator_pulse * 0.3));
+        cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.65 + (indicator_pulse * 0.3));
         cairo_arc(cr, x, y, node_size * 0.8, 0, 6.283185307179586);
         cairo_fill(cr);
     }
@@ -437,14 +418,13 @@ static void draw_verification_effect(cairo_t *cr, gint width, gint height, guint
     gdouble radius = 40.0 + (verify_progress * 80.0);
     gdouble alpha = 0.3 - (verify_progress * 0.3);
     
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, alpha);
+    cairo_set_source_rgba(cr, 0.55, 0.49, 0.96, alpha);
     cairo_set_line_width(cr, 2.0);
     cairo_arc(cr, width / 2.0, height / 2.0, radius, 0, 6.283185307179586);
     cairo_stroke(cr);
     
-    // Lock icon representation (corner brackets)
     gdouble corner_size = 20.0;
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.4 + (sin(verify_progress * 6.28) * 0.1));
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.35 + (sin(verify_progress * 6.28) * 0.1));
     cairo_set_line_width(cr, 1.5);
     
     // Top-left corner
@@ -467,16 +447,15 @@ static void draw_ai_indicators(cairo_t *cr, guint phase) {
     gdouble pulse = 0.4 + (sin(phase * 4.0 * 3.14159 / 180.0) + 1.0) * 0.3;
     
     // Top-left AI indicator
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, pulse * 0.6);
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, pulse * 0.55);
     cairo_arc(cr, 30, 30, 8.0, 0, 6.283185307179586);
     cairo_fill(cr);
     
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, pulse);
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, pulse);
     cairo_arc(cr, 30, 30, 4.0, 0, 6.283185307179586);
     cairo_fill(cr);
     
-    // Top-right AI indicator
-    cairo_set_source_rgba(cr, 0.48, 0.38, 1.0, pulse * 0.6);
+    cairo_set_source_rgba(cr, 0.55, 0.49, 0.96, pulse * 0.55);
     cairo_arc(cr, 1250, 30, 8.0, 0, 6.283185307179586);
     cairo_fill(cr);
     
@@ -548,29 +527,28 @@ static gboolean background_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user
     // Additional dynamic accent orb (top right)
     gdouble orb_phase_3 = (gdouble)((screen->logo_phase + 60) % 100) / 100.0;
     gdouble orb_glow_3 = 0.04 + (sin(orb_phase_3 * 6.283185307179586) + 1.0) * 0.06;
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, orb_glow_3);
+    cairo_set_source_rgba(cr, 0.55, 0.49, 0.96, orb_glow_3);
     cairo_arc(cr, width * 0.88, height * 0.22, 160.0, 0, 6.283185307179586);
     cairo_fill(cr);
 
-    // Animated floating particles with parallax depth
     for (guint i = 0; i < screen->particles->len; i++) {
         AuraParticle *particle = &g_array_index(screen->particles, AuraParticle, i);
         gdouble px = particle->x * width;
         gdouble py = particle->y * height;
-        
-        // Draw particle with enhanced glow
-        draw_particle_glow(cr, px, py, particle->radius, particle->alpha, 0.0, 0.85, 1.0);
+        if (i % 3 == 0)
+            draw_particle_glow(cr, px, py, particle->radius, particle->alpha, 0.94, 0.71, 0.16);
+        else
+            draw_particle_glow(cr, px, py, particle->radius, particle->alpha, 0.55, 0.49, 0.96);
     }
 
-    // Neon border glow effect
-    cairo_set_source_rgba(cr, 0.48, 0.38, 1.0, 0.08);
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.06);
     cairo_rectangle(cr, 32, 32, width - 64, height - 64);
     cairo_set_line_width(cr, 2.0);
     cairo_stroke(cr);
 
     // Corner accent glows
     gdouble corner_glow = 0.05 + (sin((screen->logo_phase * 2) * 3.14159 / 180.0) + 1.0) * 0.03;
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, corner_glow);
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, corner_glow);
     cairo_arc(cr, 40, 40, 8.0, 0, 6.283185307179586);
     cairo_fill(cr);
     cairo_arc(cr, width - 40, 40, 8.0, 0, 6.283185307179586);
@@ -611,7 +589,7 @@ static gboolean background_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user
 
         // Neon double edge strokes
         cairo_set_line_width(cr, 1.0);
-        cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.08);
+        cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.1);
         cairo_stroke(cr);
 
         cairo_new_path(cr);
@@ -625,7 +603,7 @@ static gboolean background_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user
         cairo_line_to(cr, px, py + rr);
         cairo_arc(cr, px + rr, py + rr, rr, 3.14159, 4.71239);
         cairo_set_line_width(cr, 2.4);
-        cairo_set_source_rgba(cr, 0.48, 0.38, 1.0, 0.04);
+        cairo_set_source_rgba(cr, 0.55, 0.49, 0.96, 0.08);
         cairo_stroke(cr);
 
         // Soft inner reflection (top-left glossy sweep)
@@ -760,9 +738,9 @@ static gboolean logo_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     
     // Draw outer neon glow (radial gradient) - BEFORE scaling
     cairo_pattern_t *glow_pattern = cairo_pattern_create_radial(0, 0, 35, 0, 0, 62);
-    cairo_pattern_add_color_stop_rgba(glow_pattern, 0.0, 0.0, 0.85, 1.0, 0.35);
-    cairo_pattern_add_color_stop_rgba(glow_pattern, 0.4, 0.0, 0.85, 1.0, 0.20);
-    cairo_pattern_add_color_stop_rgba(glow_pattern, 1.0, 0.0, 0.85, 1.0, 0.0);
+    cairo_pattern_add_color_stop_rgba(glow_pattern, 0.0, 0.94, 0.71, 0.16, 0.35);
+    cairo_pattern_add_color_stop_rgba(glow_pattern, 0.4, 0.94, 0.71, 0.16, 0.18);
+    cairo_pattern_add_color_stop_rgba(glow_pattern, 1.0, 0.94, 0.71, 0.16, 0.0);
     cairo_set_source(cr, glow_pattern);
     cairo_arc(cr, 0, 0, 62, 0, 6.283185307179586);
     cairo_fill(cr);
@@ -772,13 +750,12 @@ static gboolean logo_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     cairo_scale(cr, pulse, pulse);
 
     // Outer cyan circle with enhanced visibility
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.45);
+    cairo_set_source_rgba(cr, 0.94, 0.71, 0.16, 0.55);
     cairo_arc(cr, 0, 0, 34, 0, 6.283185307179586);
     cairo_set_line_width(cr, 2.4);
     cairo_stroke(cr);
     
-    // Secondary glow circle
-    cairo_set_source_rgba(cr, 0.0, 0.85, 1.0, 0.28);
+    cairo_set_source_rgba(cr, 0.55, 0.49, 0.96, 0.35);
     cairo_arc(cr, 0, 0, 36.5, 0, 6.283185307179586);
     cairo_set_line_width(cr, 1.2);
     cairo_stroke(cr);
@@ -802,8 +779,8 @@ static gboolean logo_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     cairo_move_to(cr, -ext.width / 2.0 - ext.x_bearing, 8.0);
 
     cairo_pattern_t *text_gradient = cairo_pattern_create_linear(-60, -18, 60, 18);
-    cairo_pattern_add_color_stop_rgba(text_gradient, 0.0, 0.0, 0.95, 1.0, 1.0);
-    cairo_pattern_add_color_stop_rgba(text_gradient, 1.0, 0.55, 0.45, 1.0, 1.0);
+    cairo_pattern_add_color_stop_rgba(text_gradient, 0.0, 0.98, 0.78, 0.28, 1.0);
+    cairo_pattern_add_color_stop_rgba(text_gradient, 1.0, 0.55, 0.49, 0.96, 1.0);
     cairo_set_source(cr, text_gradient);
     cairo_show_text(cr, "AURA");
     cairo_pattern_destroy(text_gradient);
@@ -814,7 +791,7 @@ static gboolean logo_draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data)
     cairo_set_source_rgba(cr, 0.75, 0.85, 1.0, 1.0);
     cairo_text_extents(cr, "NEURAL ACCESS", &ext);
     cairo_move_to(cr, -ext.width / 2.0 - ext.x_bearing, 28.0);
-    cairo_show_text(cr, "NEURAL ACCESS");
+    cairo_show_text(cr, "ESISA");
 
     return FALSE;
 }
@@ -875,12 +852,12 @@ static gboolean initialization_step_cb(gpointer user_data) {
     if (screen->auth_message_index >= screen->auth_messages->len) {
         screen->init_step_id = 0;
         if (GTK_IS_LABEL(screen->login_status_label)) {
-            gtk_label_set_text(GTK_LABEL(screen->login_status_label), "Access granted. Loading AURA workspace...");
+            gtk_label_set_text(GTK_LABEL(screen->login_status_label), "Acces autorise. Chargement de l'espace AURA...");
             set_feedback_state(screen->login_status_label, TRUE);
         }
         if (GTK_IS_PROGRESS_BAR(screen->login_progress_bar)) {
             gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(screen->login_progress_bar), 1.0);
-            gtk_progress_bar_set_text(GTK_PROGRESS_BAR(screen->login_progress_bar), "Workspace ready");
+            gtk_progress_bar_set_text(GTK_PROGRESS_BAR(screen->login_progress_bar), "Espace pret");
         }
 
         if (screen->accept_close_id == 0) {
@@ -1412,7 +1389,7 @@ static void on_window_destroy(GtkWidget *widget, gpointer user_data) {
     (void)widget;
     AuraLoginScreen *screen = (AuraLoginScreen *)user_data;
     
-    FILE *dbg = fopen("login_screen_debug.log", "a");
+    FILE *dbg = login_debug_open();
     fprintf(dbg, "[DESTROY] Window destroy event triggered\n");
     fflush(dbg);
     fclose(dbg);
@@ -1475,7 +1452,7 @@ static void on_login_clicked(GtkWidget *widget, gpointer user_data) {
     AuraAccount acct;
     memset(&acct, 0, sizeof(acct));
     if (!auth_verify_credentials(username, password, &acct)) {
-        gtk_label_set_text(GTK_LABEL(screen->login_status_label), "Access denied. Invalid email or password.");
+        gtk_label_set_text(GTK_LABEL(screen->login_status_label), "Acces refuse. Email ou mot de passe invalide.");
         set_feedback_state(screen->login_status_label, FALSE);
         gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(screen->login_progress_bar), 0.0);
         gtk_progress_bar_set_text(GTK_PROGRESS_BAR(screen->login_progress_bar), "Denied");
@@ -1485,10 +1462,10 @@ static void on_login_clicked(GtkWidget *widget, gpointer user_data) {
     aura_session_set(acct.fullname, acct.gmail);
     screen->accepted = TRUE;
     gtk_widget_set_sensitive(screen->auth_stack, FALSE);
-    gtk_label_set_text(GTK_LABEL(screen->login_status_label), "Verifying credentials...");
+    gtk_label_set_text(GTK_LABEL(screen->login_status_label), "Verification des identifiants...");
     set_feedback_state(screen->login_status_label, TRUE);
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(screen->login_progress_bar), 0.0);
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(screen->login_progress_bar), "Verifying");
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(screen->login_progress_bar), "Verification");
     screen->auth_message_index = 0;
     screen->auth_message_phase = 0;
     screen->verification_phase = 0;
@@ -1560,7 +1537,7 @@ static void destroy_login_screen(AuraLoginScreen *screen) {
 }
 
 gboolean aura_launch_login_screen(int *argc, char ***argv) {
-    FILE *dbg = fopen("login_screen_debug.log", "a");
+    FILE *dbg = login_debug_open();
     fprintf(dbg, "[LOGIN] Starting aura_launch_login_screen\n");
     fflush(dbg);
     
@@ -1574,7 +1551,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     fprintf(dbg, "[LOGIN] Creating AuraLoginScreen\n");
     fflush(dbg);
     AuraLoginScreen *screen = g_new0(AuraLoginScreen, 1);
-    screen->typing_text = g_strdup("Initializing AI Training Environment...");
+    screen->typing_text = g_strdup("Initialisation de l'environnement AURA...");
     screen->loop = g_main_loop_new(NULL, FALSE);
     initialize_particles(screen);
     
@@ -1582,15 +1559,15 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     fflush(dbg);
     // Initialize AI system messages
     screen->ai_messages = g_ptr_array_new_with_free_func(g_free);
-    g_ptr_array_add(screen->ai_messages, g_strdup("Initializing AI Core..."));
-    g_ptr_array_add(screen->ai_messages, g_strdup("Neural Systems Online"));
-    g_ptr_array_add(screen->ai_messages, g_strdup("Access Verification Ready"));
-    g_ptr_array_add(screen->ai_messages, g_strdup("Secure Connection Established"));
+    g_ptr_array_add(screen->ai_messages, g_strdup("Initialisation du noyau IA..."));
+    g_ptr_array_add(screen->ai_messages, g_strdup("Systemes neuronaux en ligne"));
+    g_ptr_array_add(screen->ai_messages, g_strdup("Verification d'acces prete"));
+    g_ptr_array_add(screen->ai_messages, g_strdup("Connexion securisee etablie"));
     screen->message_index = 0;
     screen->message_phase = 0;
 
     screen->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(screen->window), "AURA Access");
+    gtk_window_set_title(GTK_WINDOW(screen->window), "AURA — Connexion ESISA");
     gtk_window_set_default_size(GTK_WINDOW(screen->window), 1280, 920);
     gtk_window_set_position(GTK_WINDOW(screen->window), GTK_WIN_POS_CENTER);
     gtk_window_set_resizable(GTK_WINDOW(screen->window), TRUE);
@@ -1640,7 +1617,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_box_pack_start(GTK_BOX(left_panel), screen->logo_area, FALSE, FALSE, 0);
 
     // AI status messages in left panel
-    screen->status_label = gtk_label_new("Initializing AI Core...");
+    screen->status_label = gtk_label_new("Initialisation du noyau IA...");
     gtk_label_set_xalign(GTK_LABEL(screen->status_label), 0.5f);
     gtk_label_set_line_wrap(GTK_LABEL(screen->status_label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(screen->status_label), 42);
@@ -1678,12 +1655,12 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_box_pack_start(GTK_BOX(login_page), login_card, TRUE, TRUE, 0);
 
     GtkWidget *form_title = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(form_title), "<span weight='900' size='28000' foreground='#EAF4FF'>Welcome Back</span>");
+    gtk_label_set_markup(GTK_LABEL(form_title), "<span weight='900' size='28000' foreground='#FAF7F2'>Bon retour</span>");
     gtk_label_set_xalign(GTK_LABEL(form_title), 0.0f);
     gtk_widget_set_margin_bottom(form_title, 12);
     gtk_box_pack_start(GTK_BOX(login_card), form_title, FALSE, FALSE, 0);
 
-    GtkWidget *form_subtitle = gtk_label_new("Access your AI-powered training workspace");
+    GtkWidget *form_subtitle = gtk_label_new("Accedez a votre espace de preparation aux entretiens");
     gtk_label_set_xalign(GTK_LABEL(form_subtitle), 0.0f);
     gtk_label_set_line_wrap(GTK_LABEL(form_subtitle), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(form_subtitle), 36);
@@ -1704,7 +1681,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_grid_attach(GTK_GRID(form), email_label, 0, 0, 1, 1);
 
     screen->username_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->username_entry), "Enter your email address");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->username_entry), "Votre adresse Gmail");
     add_class(screen->username_entry, "login-entry");
     gtk_widget_set_hexpand(screen->username_entry, TRUE);
     gtk_widget_set_size_request(screen->username_entry, -1, 52);
@@ -1718,7 +1695,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_grid_attach(GTK_GRID(form), pass_label, 0, 2, 1, 1);
 
     screen->password_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->password_entry), "Enter secure password");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->password_entry), "Votre mot de passe");
     gtk_entry_set_visibility(GTK_ENTRY(screen->password_entry), FALSE);
     gtk_entry_set_invisible_char(GTK_ENTRY(screen->password_entry), 0x2022);
     add_class(screen->password_entry, "login-entry");
@@ -1731,7 +1708,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_widget_set_margin_bottom(options_row, 24);
     gtk_box_pack_start(GTK_BOX(login_card), options_row, FALSE, FALSE, 0);
 
-    GtkWidget *remember_check = gtk_check_button_new_with_label("Remember me");
+    GtkWidget *remember_check = gtk_check_button_new_with_label("Se souvenir de moi");
     add_class(remember_check, "remember-check");
     gtk_box_pack_start(GTK_BOX(options_row), remember_check, FALSE, FALSE, 0);
 
@@ -1761,7 +1738,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_widget_set_hexpand(button_row, TRUE);
     gtk_box_pack_start(GTK_BOX(login_card), button_row, FALSE, FALSE, 0);
 
-    screen->login_button = gtk_button_new_with_label("Access AURA Workspace");
+    screen->login_button = gtk_button_new_with_label("Acceder a AURA");
     add_class(screen->login_button, "login-button");
     gtk_widget_set_hexpand(screen->login_button, TRUE);
     gtk_widget_set_size_request(screen->login_button, -1, 56);
@@ -1769,13 +1746,13 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(screen->login_button, "clicked", G_CALLBACK(on_login_clicked), screen);
     connect_interactive_button(screen->login_button);
 
-    GtkWidget *divider = gtk_label_new("────── OR ──────");
+    GtkWidget *divider = gtk_label_new("────── OU ──────");
     add_class(divider, "divider-label");
     gtk_widget_set_margin_top(divider, 8);
     gtk_widget_set_margin_bottom(divider, 8);
     gtk_box_pack_start(GTK_BOX(button_row), divider, FALSE, FALSE, 0);
 
-    GtkWidget *signup_button = gtk_button_new_with_label("Create New Account");
+    GtkWidget *signup_button = gtk_button_new_with_label("Creer un compte");
     add_class(signup_button, "signup-button");
     gtk_widget_set_hexpand(signup_button, TRUE);
     gtk_widget_set_size_request(signup_button, -1, 56);
@@ -1783,7 +1760,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(signup_button, "clicked", G_CALLBACK(on_open_signup_clicked), screen);
     connect_interactive_button(signup_button);
 
-    screen->exit_button = gtk_button_new_with_label("Exit");
+    screen->exit_button = gtk_button_new_with_label("Quitter");
     add_class(screen->exit_button, "exit-button");
     gtk_widget_set_hexpand(screen->exit_button, TRUE);
     gtk_widget_set_size_request(screen->exit_button, -1, 46);
@@ -1791,7 +1768,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(screen->exit_button, "clicked", G_CALLBACK(on_exit_clicked), screen);
     connect_interactive_button(screen->exit_button);
 
-    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), login_page, "login", "Login");
+    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), login_page, "login", "Connexion");
     screen->login_page = login_page;
 
     GtkWidget *signup_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -1805,12 +1782,12 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_box_pack_start(GTK_BOX(signup_page), signup_card, TRUE, TRUE, 0);
 
     GtkWidget *signup_title = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(signup_title), "<span weight='900' size='28000' foreground='#EAF4FF'>Create Account</span>");
+    gtk_label_set_markup(GTK_LABEL(signup_title), "<span weight='900' size='28000' foreground='#FAF7F2'>Creer un compte</span>");
     gtk_label_set_xalign(GTK_LABEL(signup_title), 0.0f);
     gtk_widget_set_margin_bottom(signup_title, 12);
     gtk_box_pack_start(GTK_BOX(signup_card), signup_title, FALSE, FALSE, 0);
 
-    GtkWidget *signup_subtitle = gtk_label_new("Create your AURA Workspace account");
+    GtkWidget *signup_subtitle = gtk_label_new("Rejoignez le simulateur d'entretiens ESISA");
     gtk_label_set_xalign(GTK_LABEL(signup_subtitle), 0.0f);
     gtk_label_set_line_wrap(GTK_LABEL(signup_subtitle), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(signup_subtitle), 40);
@@ -1824,13 +1801,13 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_widget_set_hexpand(signup_form, TRUE);
     gtk_box_pack_start(GTK_BOX(signup_card), signup_form, FALSE, FALSE, 0);
 
-    GtkWidget *fullname_label = gtk_label_new("FULL NAME");
+    GtkWidget *fullname_label = gtk_label_new("NOM COMPLET");
     gtk_widget_set_halign(fullname_label, GTK_ALIGN_START);
     add_class(fullname_label, "field-label");
     gtk_grid_attach(GTK_GRID(signup_form), fullname_label, 0, 0, 1, 1);
 
     screen->signup_fullname_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_fullname_entry), "Enter your full name");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_fullname_entry), "Votre nom complet");
     add_class(screen->signup_fullname_entry, "login-entry");
     gtk_widget_set_size_request(screen->signup_fullname_entry, -1, 50);
     gtk_grid_attach(GTK_GRID(signup_form), screen->signup_fullname_entry, 0, 1, 1, 1);
@@ -1842,7 +1819,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_grid_attach(GTK_GRID(signup_form), signup_email_label, 0, 2, 1, 1);
 
     screen->signup_email_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_email_entry), "Enter your email address");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_email_entry), "Votre adresse e-mail");
     add_class(screen->signup_email_entry, "login-entry");
     gtk_widget_set_size_request(screen->signup_email_entry, -1, 50);
     gtk_grid_attach(GTK_GRID(signup_form), screen->signup_email_entry, 0, 3, 1, 1);
@@ -1854,21 +1831,21 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_grid_attach(GTK_GRID(signup_form), signup_pass_label, 0, 4, 1, 1);
 
     screen->signup_password_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_password_entry), "Create a secure password");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_password_entry), "Choisissez un mot de passe");
     gtk_entry_set_visibility(GTK_ENTRY(screen->signup_password_entry), FALSE);
     gtk_entry_set_invisible_char(GTK_ENTRY(screen->signup_password_entry), 0x2022);
     add_class(screen->signup_password_entry, "login-entry");
     gtk_widget_set_size_request(screen->signup_password_entry, -1, 50);
     gtk_grid_attach(GTK_GRID(signup_form), screen->signup_password_entry, 0, 5, 1, 1);
 
-    GtkWidget *signup_confirm_label = gtk_label_new("CONFIRM PASSWORD");
+    GtkWidget *signup_confirm_label = gtk_label_new("CONFIRMER");
     gtk_widget_set_halign(signup_confirm_label, GTK_ALIGN_START);
     gtk_widget_set_margin_top(signup_confirm_label, 6);
     add_class(signup_confirm_label, "field-label");
     gtk_grid_attach(GTK_GRID(signup_form), signup_confirm_label, 0, 6, 1, 1);
 
     screen->signup_confirm_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_confirm_entry), "Confirm secure password");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->signup_confirm_entry), "Confirmez le mot de passe");
     gtk_entry_set_visibility(GTK_ENTRY(screen->signup_confirm_entry), FALSE);
     gtk_entry_set_invisible_char(GTK_ENTRY(screen->signup_confirm_entry), 0x2022);
     add_class(screen->signup_confirm_entry, "login-entry");
@@ -1894,7 +1871,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     GtkWidget *signup_actions = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(signup_card), signup_actions, FALSE, FALSE, 0);
 
-    GtkWidget *create_button = gtk_button_new_with_label("Create Account");
+    GtkWidget *create_button = gtk_button_new_with_label("Creer le compte");
     add_class(create_button, "login-button");
     gtk_widget_set_hexpand(create_button, TRUE);
     gtk_widget_set_size_request(create_button, -1, 56);
@@ -1902,7 +1879,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(create_button, "clicked", G_CALLBACK(on_create_account_clicked), screen);
     connect_interactive_button(create_button);
 
-    screen->return_login_button = gtk_button_new_with_label("Return to Login");
+    screen->return_login_button = gtk_button_new_with_label("Retour connexion");
     add_class(screen->return_login_button, "return-button");
     gtk_widget_set_hexpand(screen->return_login_button, TRUE);
     gtk_widget_set_size_request(screen->return_login_button, -1, 50);
@@ -1910,7 +1887,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(screen->return_login_button, "clicked", G_CALLBACK(on_return_login_clicked), screen);
     connect_interactive_button(screen->return_login_button);
 
-    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), signup_page, "signup", "Create Account");
+    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), signup_page, "signup", "Inscription");
     screen->signup_page = signup_page;
 
     GtkWidget *recovery_page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -1924,12 +1901,12 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_box_pack_start(GTK_BOX(recovery_page), recovery_card, TRUE, TRUE, 0);
 
     GtkWidget *recovery_title = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(recovery_title), "<span weight='900' size='28000' foreground='#EAF4FF'>Password Recovery</span>");
+    gtk_label_set_markup(GTK_LABEL(recovery_title), "<span weight='900' size='28000' foreground='#FAF7F2'>Mot de passe oublie</span>");
     gtk_label_set_xalign(GTK_LABEL(recovery_title), 0.0f);
     gtk_widget_set_margin_bottom(recovery_title, 12);
     gtk_box_pack_start(GTK_BOX(recovery_card), recovery_title, FALSE, FALSE, 0);
 
-    GtkWidget *recovery_copy = gtk_label_new("Password recovery unavailable in offline mode.");
+    GtkWidget *recovery_copy = gtk_label_new("La recuperation de mot de passe n'est pas disponible en mode hors-ligne.");
     gtk_label_set_xalign(GTK_LABEL(recovery_copy), 0.0f);
     gtk_label_set_line_wrap(GTK_LABEL(recovery_copy), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(recovery_copy), 40);
@@ -1937,7 +1914,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_widget_set_margin_bottom(recovery_copy, 24);
     gtk_box_pack_start(GTK_BOX(recovery_card), recovery_copy, FALSE, FALSE, 0);
 
-    screen->recovery_status_label = gtk_label_new("Use the return button to go back to the login page.");
+    screen->recovery_status_label = gtk_label_new("Utilisez le bouton retour pour revenir a la connexion.");
     gtk_label_set_xalign(GTK_LABEL(screen->recovery_status_label), 0.0f);
     gtk_label_set_line_wrap(GTK_LABEL(screen->recovery_status_label), TRUE);
     add_class(screen->recovery_status_label, "feedback-label");
@@ -1947,7 +1924,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     GtkWidget *recovery_actions = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(recovery_card), recovery_actions, FALSE, FALSE, 0);
 
-    screen->recovery_back_button = gtk_button_new_with_label("Return to Login");
+    screen->recovery_back_button = gtk_button_new_with_label("Retour connexion");
     add_class(screen->recovery_back_button, "return-button");
     gtk_widget_set_hexpand(screen->recovery_back_button, TRUE);
     gtk_widget_set_size_request(screen->recovery_back_button, -1, 50);
@@ -1955,7 +1932,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(screen->recovery_back_button, "clicked", G_CALLBACK(on_return_login_clicked), screen);
     connect_interactive_button(screen->recovery_back_button);
 
-    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), recovery_page, "recovery", "Password Recovery");
+    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), recovery_page, "recovery", "Recuperation");
     screen->recovery_page = recovery_page;
 
     /* ===== VERIFICATION PAGE ===== */
@@ -1971,13 +1948,13 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
 
     /* Title */
     GtkWidget *verification_title = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(verification_title), "<span weight='900' size='28000' foreground='#EAF4FF'>Email Verification</span>");
+    gtk_label_set_markup(GTK_LABEL(verification_title), "<span weight='900' size='28000' foreground='#FAF7F2'>Verification email</span>");
     gtk_label_set_xalign(GTK_LABEL(verification_title), 0.0f);
     gtk_widget_set_margin_bottom(verification_title, 12);
     gtk_box_pack_start(GTK_BOX(verification_card), verification_title, FALSE, FALSE, 0);
 
     /* Email display */
-    GtkWidget *verify_email_intro = gtk_label_new("Verification code sent to:");
+    GtkWidget *verify_email_intro = gtk_label_new("Code de verification envoye a :");
     gtk_label_set_xalign(GTK_LABEL(verify_email_intro), 0.0f);
     add_class(verify_email_intro, "login-subtitle");
     gtk_widget_set_margin_bottom(verify_email_intro, 6);
@@ -1990,14 +1967,14 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     gtk_box_pack_start(GTK_BOX(verification_card), screen->verification_email_label, FALSE, FALSE, 0);
 
     /* Code input */
-    GtkWidget *code_label = gtk_label_new("Enter Verification Code");
+    GtkWidget *code_label = gtk_label_new("CODE DE VERIFICATION");
     gtk_label_set_xalign(GTK_LABEL(code_label), 0.0f);
     add_class(code_label, "field-label");
     gtk_widget_set_margin_bottom(code_label, 8);
     gtk_box_pack_start(GTK_BOX(verification_card), code_label, FALSE, FALSE, 0);
 
     screen->verification_code_entry = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->verification_code_entry), "Enter 6-digit code");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(screen->verification_code_entry), "Code a 6 chiffres");
     add_class(screen->verification_code_entry, "name-entry");
     gtk_entry_set_max_length(GTK_ENTRY(screen->verification_code_entry), 6);
     gtk_widget_set_margin_bottom(screen->verification_code_entry, 20);
@@ -2015,7 +1992,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     GtkWidget *verification_actions = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(verification_card), verification_actions, FALSE, FALSE, 0);
 
-    screen->verification_confirm_button = gtk_button_new_with_label("Verify Code");
+    screen->verification_confirm_button = gtk_button_new_with_label("Verifier le code");
     add_class(screen->verification_confirm_button, "primary-action");
     gtk_widget_set_hexpand(screen->verification_confirm_button, TRUE);
     gtk_widget_set_size_request(screen->verification_confirm_button, -1, 50);
@@ -2027,7 +2004,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     GtkWidget *resend_container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
     gtk_box_pack_start(GTK_BOX(verification_actions), resend_container, FALSE, FALSE, 0);
 
-    screen->verification_resend_label = gtk_label_new("Didn't receive the code?");
+    screen->verification_resend_label = gtk_label_new("Vous n'avez pas recu le code ?");
     gtk_label_set_xalign(GTK_LABEL(screen->verification_resend_label), 0.5f);
     add_class(screen->verification_resend_label, "login-subtitle");
     gtk_widget_set_margin_bottom(screen->verification_resend_label, 4);
@@ -2042,7 +2019,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(screen->verification_resend_button, "clicked", G_CALLBACK(on_verification_resend_clicked), screen);
     connect_interactive_button(screen->verification_resend_button);
 
-    screen->verification_back_button = gtk_button_new_with_label("Back to Login");
+    screen->verification_back_button = gtk_button_new_with_label("Retour connexion");
     add_class(screen->verification_back_button, "return-button");
     gtk_widget_set_hexpand(screen->verification_back_button, TRUE);
     gtk_widget_set_size_request(screen->verification_back_button, -1, 50);
@@ -2050,7 +2027,7 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     g_signal_connect(screen->verification_back_button, "clicked", G_CALLBACK(on_verification_back_clicked), screen);
     connect_interactive_button(screen->verification_back_button);
 
-    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), verification_page, "verification", "Email Verification");
+    gtk_stack_add_titled(GTK_STACK(screen->auth_stack), verification_page, "verification", "Verification");
     screen->verification_page = verification_page;
 
     gtk_stack_set_transition_type(GTK_STACK(screen->auth_stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
@@ -2076,16 +2053,17 @@ gboolean aura_launch_login_screen(int *argc, char ***argv) {
     screen->components_shown = FALSE;
 
     screen->auth_messages = g_ptr_array_new_with_free_func(g_free);
-    g_ptr_array_add(screen->auth_messages, g_strdup("Verifying credentials..."));
-    g_ptr_array_add(screen->auth_messages, g_strdup("Access granted..."));
-    g_ptr_array_add(screen->auth_messages, g_strdup("Loading AURA workspace..."));
-    g_ptr_array_add(screen->auth_messages, g_strdup("Initializing user environment..."));
+    g_ptr_array_add(screen->auth_messages, g_strdup("Verification des identifiants..."));
+    g_ptr_array_add(screen->auth_messages, g_strdup("Acces autorise..."));
+    g_ptr_array_add(screen->auth_messages, g_strdup("Chargement de l'espace AURA..."));
+    g_ptr_array_add(screen->auth_messages, g_strdup("Initialisation de l'environnement..."));
 
     gtk_widget_hide(screen->auth_stack);
 
     fprintf(dbg, "[LOGIN] Before gtk_widget_show_all\n");
     fflush(dbg);
     gtk_widget_show_all(screen->window);
+    gtk_window_present(GTK_WINDOW(screen->window));
 
     fprintf(dbg, "[LOGIN] After gtk_widget_show_all\n");
     fflush(dbg);

@@ -171,7 +171,7 @@ static bool send_verification_code_email(const char *gmail, guint code, char *er
 }
 
 bool auth_init(const char *accounts_path) {
-    // initialize database and ensure user/code tables exist
+    (void)accounts_path;
     init_db();
     return true;
 }

@@ -2,6 +2,7 @@
 #include "filesystem.h"
 #include "assets.h"
 #include "config.h"
+#include "aura_theme.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,12 +13,12 @@
  */
 const char *aura_startup_get_phase_name(AuraStartupPhase phase) {
     static const char *phase_names[] = {
-        "Initializing...",
-        "Setting up filesystem...",
-        "Loading assets...",
-        "Loading configuration...",
-        "Initializing database...",
-        "Complete!"
+        "Demarrage...",
+        "Systeme de fichiers...",
+        "Chargement des assets...",
+        "Configuration...",
+        "Base de donnees...",
+        "Pret !"
     };
     
     if (phase >= 0 && phase <= STARTUP_PHASE_COMPLETE) {
@@ -48,46 +49,36 @@ AuraStartupScreen *aura_startup_create_splash(void) {
     // Apply CSS styling for splash screen
     GtkCssProvider *provider = gtk_css_provider_new();
     const gchar *css =
+        AURA_CSS_BASE
         "window.aura-splash { "
-        "  background: linear-gradient(135deg, #050816 0%, #0E1628 50%, #050816 100%); "
+        "  background: linear-gradient(145deg, #0A0812 0%, #14101F 50%, #0A0812 100%); "
         "}"
-        ".splash-main { "
-        "  background-color: transparent; "
-        "}"
+        ".splash-main { background-color: transparent; }"
         ".splash-title { "
-        "  color: #EAF4FF; "
-        "  font-size: 48px; "
+        "  color: #F0B429; "
+        "  font-size: 56px; "
         "  font-weight: 900; "
-        "  letter-spacing: -1px; "
+        "  letter-spacing: 6px; "
         "}"
         ".splash-subtitle { "
-        "  color: #7A9CC6; "
-        "  font-size: 14px; "
-        "  font-weight: 400; "
-        "  letter-spacing: 2px; "
-        "  margin-top: 8px; "
+        "  color: #9A8FAE; "
+        "  font-size: 13px; "
+        "  font-weight: 600; "
+        "  letter-spacing: 3px; "
+        "  margin-top: 10px; "
         "}"
         ".splash-status { "
-        "  color: #A8B8D8; "
-        "  font-size: 12px; "
+        "  color: #D8CEE8; "
+        "  font-size: 13px; "
         "  font-weight: 500; "
-        "  margin-top: 32px; "
+        "  margin-top: 36px; "
         "}"
         ".splash-phase { "
-        "  color: #00E5FF; "
+        "  color: #8B7CF6; "
         "  font-size: 11px; "
-        "  font-weight: 600; "
-        "  letter-spacing: 0.5px; "
-        "  margin-top: 12px; "
-        "}"
-        "progressbar trough { "
-        "  background-color: rgba(255, 255, 255, 0.06); "
-        "  border-radius: 999px; "
-        "  min-height: 6px; "
-        "}"
-        "progressbar progress { "
-        "  background-image: linear-gradient(90deg, #00E5FF 0%, #7A5CFF 100%); "
-        "  border-radius: 999px; "
+        "  font-weight: 700; "
+        "  letter-spacing: 1px; "
+        "  margin-top: 10px; "
         "}"
     ;
     
@@ -116,7 +107,7 @@ AuraStartupScreen *aura_startup_create_splash(void) {
     gtk_box_pack_start(GTK_BOX(main_box), title_label, FALSE, FALSE, 0);
     
     // Create subtitle
-    GtkWidget *subtitle_label = gtk_label_new("AI SIMULATION ENVIRONMENT");
+    GtkWidget *subtitle_label = gtk_label_new("SIMULATEUR D'ENTRETIENS ESISA");
     gtk_style_context_add_class(gtk_widget_get_style_context(subtitle_label), "splash-subtitle");
     gtk_box_pack_start(GTK_BOX(main_box), subtitle_label, FALSE, FALSE, 0);
     
@@ -125,7 +116,7 @@ AuraStartupScreen *aura_startup_create_splash(void) {
     gtk_box_pack_start(GTK_BOX(main_box), spacer, TRUE, TRUE, 0);
     
     // Create status label
-    startup->status_label = gtk_label_new("Initializing...");
+    startup->status_label = gtk_label_new("Initialisation...");
     gtk_style_context_add_class(gtk_widget_get_style_context(startup->status_label), "splash-status");
     gtk_box_pack_start(GTK_BOX(main_box), startup->status_label, FALSE, FALSE, 0);
     
@@ -213,7 +204,7 @@ bool aura_startup_run_sequence(void) {
     }
     
     // Phase 1: Filesystem initialization
-    aura_startup_update_progress(startup, STARTUP_PHASE_FILESYSTEM, 15, "Initializing filesystem...");
+    aura_startup_update_progress(startup, STARTUP_PHASE_FILESYSTEM, 15, "Initialisation du systeme de fichiers...");
     if (!aura_fs_init()) {
         fprintf(stderr, "[AURA ERROR] Filesystem initialization failed\n");
         aura_startup_destroy(startup);
@@ -222,7 +213,7 @@ bool aura_startup_run_sequence(void) {
     printf("[AURA] [OK] Filesystem initialized\n");
     
     // Phase 2: Assets loading
-    aura_startup_update_progress(startup, STARTUP_PHASE_ASSETS, 35, "Loading assets...");
+    aura_startup_update_progress(startup, STARTUP_PHASE_ASSETS, 35, "Chargement des ressources...");
     if (!aura_assets_init()) {
         fprintf(stderr, "[AURA ERROR] Assets initialization failed\n");
         aura_startup_destroy(startup);
@@ -234,7 +225,7 @@ bool aura_startup_run_sequence(void) {
     printf("[AURA] [OK] Assets loaded\n");
     
     // Phase 3: Configuration loading
-    aura_startup_update_progress(startup, STARTUP_PHASE_CONFIG, 55, "Loading configuration...");
+    aura_startup_update_progress(startup, STARTUP_PHASE_CONFIG, 55, "Chargement de la configuration...");
     if (!aura_config_init()) {
         fprintf(stderr, "[AURA ERROR] Configuration initialization failed\n");
         aura_startup_destroy(startup);
@@ -243,7 +234,7 @@ bool aura_startup_run_sequence(void) {
     printf("[AURA] [OK] Configuration loaded\n");
     
     // Phase 4: Database initialization
-    aura_startup_update_progress(startup, STARTUP_PHASE_DATABASE, 75, "Initializing database...");
+    aura_startup_update_progress(startup, STARTUP_PHASE_DATABASE, 75, "Initialisation de la base...");
     
     // Initialize auth subsystem with proper path
     char accounts_path[1024];
@@ -259,7 +250,7 @@ bool aura_startup_run_sequence(void) {
     printf("[AURA] [OK] Database initialized\n");
     
     // Final phase: Complete
-    aura_startup_update_progress(startup, STARTUP_PHASE_COMPLETE, 100, "Initialization complete!");
+    aura_startup_update_progress(startup, STARTUP_PHASE_COMPLETE, 100, "Initialisation terminee !");
     printf("[AURA] [OK] All systems initialized successfully\n");
 
     printf("[AURA] -----------------------------------------------------------\n");

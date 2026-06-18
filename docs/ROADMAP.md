@@ -1,35 +1,42 @@
-Feuille de Route et Prompts - Projet Aura-CLI
+# Feuille de route — AURA ESISA (2026)
 
+## Etat actuel (fait)
 
-👥 Répartition des Rôles
+- Application desktop GTK3 + C
+- Auth SQLite (inscription, connexion, verification e-mail)
+- Entretiens : 3 matieres, 4 niveaux, banque CSV + anti-repetition
+- Evaluation IA Groq (libcurl + cJSON) + fallback local
+- Dashboard, classement filtre, rapports PDF
+- Build Windows : `build.ps1` → `bin\bin\`
+- Lanceurs : `AURA.bat`, mode `/debug`, `launch_aura.ps1`
+- CI GitHub Actions (make + tests)
 
-PM (Moi) : Gère le GitHub, le README, l'architecture, la documentation et l'assemblage (Merge).
+## Avant soutenance
 
-Dev 1 (Système) : Gère le terminal, l'affichage (main.c), le Makefile, et la base de données (SQLite).
+- [ ] Demo live preparee (parcours 2 min)
+- [ ] Video LinkedIn (script : `docs/LINKEDIN_VIDEO.md`)
+- [ ] Package release : `scripts\package_release.ps1`
+- [ ] Verifier cle Groq sur machine de demo
 
-Dev 2 (Réseau/IA) : Gère la connexion avec l'API (libcurl) et le parsing (cJSON).
+## Ameliorations court terme
 
+- Icone application (`rsc/aura.ico` + windres)
+- Assets reels (logo, intro) a la place des placeholders
+- Traduction complete FR (ecran legacy `main.c` si encore utilise)
+- Tests supplementaires (question_bank, auth)
 
-📅 Planning Hebdomadaire
+## Perspectives
 
-Semaine 1 : Squelette, Makefile, Menu CLI interactif, Test API sur Postman, Docs.
+- Sync cloud (Supabase) pour classement multi-machines
+- Generateur de questions IA a la volee
+- Installateur Windows (Inno Setup / NSIS)
+- Distribution Itch.io
 
-Semaine 2 : Intégration libcurl et cJSON (Faire parler l'IA en C).
+## Equipe
 
-Semaine 3 : Intégration SQLite (Sauvegarde des scores) et gestion des erreurs (crash, réseau).
-
-Semaine 4 : Tests finaux, Vidéo de démonstration, Nettoyage du code, Présentation.
-
-
-🤖 Bibliothèque de Prompts (Code Vibing)
-
-Voici les prompts à utiliser avec l'IA pour générer le code :
-Pour le Makefile : "Écris un Makefile propre. Sources dans src/, headers dans include/, obj/, bin/. Ajoute -lcurl et -lsqlite3."
-
-Pour le Menu : "Crée main.c avec un menu interactif CLI en couleurs (ANSI). Boucle infinie, switch/case."
-
-Pour l'API : "Écris une fonction C avec libcurl qui fait un POST vers l'API. Lis la clé depuis getenv()."
-
-Pour cJSON : "Écris une fonction qui parse ce JSON [exemple] avec cJSON et extrait le 'content'."
-
-Pour SQLite : "Écris des fonctions pour init_db(), insert_score() et afficher_leaderboard() avec sqlite3."
+| Role | Perimetre |
+|------|-----------|
+| UI / GTK | `login_ui.c`, `dashboard_ui.c`, theme |
+| Backend C | `api.c`, `db.c`, `interview.c`, `report.c` |
+| Build / release | `build.ps1`, `Makefile`, CI |
+| Doc / soutenance | `docs/`, README |

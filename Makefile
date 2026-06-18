@@ -105,9 +105,13 @@ RELEASE_LOGS = $(RELEASE_DIR)/logs
 
 ICON_FILE = rsc/aura.ico
 
-.PHONY: release package
+.PHONY: release release-win package
 
-release: all package
+release: release-win
+
+release-win:
+	powershell -ExecutionPolicy Bypass -File build.ps1
+	powershell -ExecutionPolicy Bypass -File scripts/package_release.ps1
 
 package: $(TARGET)
 	@echo Preparing release folder '$(RELEASE_DIR)'

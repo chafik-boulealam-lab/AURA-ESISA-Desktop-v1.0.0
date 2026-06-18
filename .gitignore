@@ -25,12 +25,23 @@ bin/bin/data/reports/
 
 # Archives / binaires packagés
 *.zip
+AURA-ESISA/
 test_*.exe
 test_*.txt
+test_gtk.c
+test_minimal.c
+Untitled*.c
 aura_*.log
+aura_run_*.txt
 login_screen_debug.log
 runlog.txt
 run_utf8.log
+
+# Artefacts generes (sources versionnees a la racine)
+bin/bin/AURA.bat
+bin/bin/Lancer_AURA.bat
+bin/bin/cacert.pem
+bin/bin/assets/
 
 # OS
 Thumbs.db

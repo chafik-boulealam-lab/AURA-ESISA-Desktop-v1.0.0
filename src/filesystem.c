@@ -109,6 +109,14 @@ bool aura_fs_verify_structure(void) {
         }
         printf("[AURA] Directory verified: %s\n", dirs[i]);
     }
+
+    char reports_dir[1024];
+    snprintf(reports_dir, sizeof(reports_dir), "%s%sreports", g_aura_fs.data_dir, PATH_SEPARATOR);
+    if (!aura_fs_mkdir_recursive(reports_dir)) {
+        fprintf(stderr, "[AURA ERROR] Failed to create directory: %s\n", reports_dir);
+        return false;
+    }
+    printf("[AURA] Directory verified: %s\n", reports_dir);
     
     return true;
 }

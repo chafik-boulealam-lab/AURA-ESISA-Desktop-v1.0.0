@@ -389,7 +389,7 @@ int main(int argc, char *argv[]) {
     gtk_box_pack_start(GTK_BOX(name_block), label_nom, FALSE, FALSE, 0);
 
     entry_nom = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_nom), "Full Name");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_nom), "Nom complet");
     add_class(entry_nom, "name-entry");
     gtk_box_pack_start(GTK_BOX(name_block), entry_nom, FALSE, FALSE, 0);
 
@@ -461,7 +461,7 @@ int main(int argc, char *argv[]) {
         gtk_box_pack_start(GTK_BOX(step2_box), step2_label, FALSE, FALSE, 0);
         
         tabs[i].entry_reponse = gtk_entry_new();
-        gtk_entry_set_placeholder_text(GTK_ENTRY(tabs[i].entry_reponse), "Type your answer here...");
+        gtk_entry_set_placeholder_text(GTK_ENTRY(tabs[i].entry_reponse), "Saisissez votre reponse ici...");
         gtk_box_pack_start(GTK_BOX(step2_box), tabs[i].entry_reponse, FALSE, FALSE, 0);
         add_class(tabs[i].entry_reponse, "response-entry");
         gtk_box_pack_start(GTK_BOX(page_vbox), step2_box, FALSE, FALSE, 0);

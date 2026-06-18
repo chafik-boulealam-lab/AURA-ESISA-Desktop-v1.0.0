@@ -11,17 +11,16 @@ Copy-Item "$PSScriptRoot\bin\AURA.exe" "$PSScriptRoot\bin\bin\AURA.exe" -Force
 Copy-Item "$PSScriptRoot\data\questions.csv" "$PSScriptRoot\bin\bin\data\questions.csv" -Force
 Copy-Item "$PSScriptRoot\data\local.db" "$PSScriptRoot\bin\bin\data\local.db" -Force -ErrorAction SilentlyContinue
 powershell -ExecutionPolicy Bypass -File "$PSScriptRoot\package_dlls.ps1"
-@'
-@echo off
-title ESISA Interview Simulator
-cd /d "%~dp0"
-if not exist "AURA.exe" (
-    echo ERREUR: AURA.exe introuvable dans ce dossier.
-    pause
-    exit /b 1
-)
-start "" "%~dp0AURA.exe"
-'@ | Set-Content -Path "$PSScriptRoot\bin\bin\Lancer_AURA.bat" -Encoding ASCII
+
+$caDest = "$PSScriptRoot\bin\bin\cacert.pem"
+if (-not (Test-Path $caDest)) {
+    $caSrc = "C:\msys64\mingw64\etc\ssl\certs\ca-bundle.crt"
+    if (Test-Path $caSrc) {
+        Copy-Item $caSrc $caDest -Force
+        Write-Host "CA bundle: cacert.pem"
+    }
+}
+
 if (Test-Path "$PSScriptRoot\config\aura.cfg") {
     Copy-Item "$PSScriptRoot\config\aura.cfg" "$PSScriptRoot\bin\bin\config\aura.cfg" -Force
     Write-Host "Config: cle Groq copiee depuis config\aura.cfg"
@@ -29,5 +28,19 @@ if (Test-Path "$PSScriptRoot\config\aura.cfg") {
     Copy-Item "$PSScriptRoot\config\aura.cfg.example" "$PSScriptRoot\bin\bin\config\aura.cfg" -Force -ErrorAction SilentlyContinue
     Write-Host "ATTENTION: ajoutez groq_api_key dans config\aura.cfg"
 }
+
+Copy-Item "$PSScriptRoot\AURA.bat" "$PSScriptRoot\bin\bin\AURA.bat" -Force
+Copy-Item "$PSScriptRoot\scripts\Lancer_AURA_console.bat" "$PSScriptRoot\bin\bin\Lancer_AURA.bat" -Force
+
+$assetSrc = "$PSScriptRoot\release_templates\assets"
+$assetDest = "$PSScriptRoot\bin\bin\assets"
+if (Test-Path $assetSrc) {
+    New-Item -ItemType Directory -Force -Path $assetDest | Out-Null
+    Copy-Item "$assetSrc\*" $assetDest -Recurse -Force
+    Write-Host "Assets: release_templates\assets -> bin\bin\assets"
+}
+
 Write-Host "Build OK: bin\bin\AURA.exe"
-Write-Host "Lancement: double-cliquez bin\bin\Lancer_AURA.bat"
+Write-Host "Lancement: AURA.bat (racine) ou bin\bin\AURA.bat"
+Write-Host "Debug:     AURA.bat /debug | Lancer_AURA.bat | .\launch_aura.ps1 -Debug"
+Write-Host "Release:   .\scripts\package_release.ps1"

@@ -5,6 +5,7 @@
 #include "api.h"
 #include "evaluation.h"
 #include "config.h"
+#include "filesystem.h"
 #include "cJSON.h"
 
 // Callback pour l'animation d'attente (Spinner ASCII)
@@ -123,6 +124,29 @@ static char* send_curl_request(const char* post_data) {
 
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
+
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+        {
+            const char *root = aura_fs_get_app_root();
+            char cainfo[1200];
+#ifdef _WIN32
+            snprintf(cainfo, sizeof(cainfo), "%s\\cacert.pem", root ? root : ".");
+#else
+            snprintf(cainfo, sizeof(cainfo), "%s/cacert.pem", root ? root : ".");
+#endif
+            if (aura_fs_file_exists(cainfo)) {
+                curl_easy_setopt(curl, CURLOPT_CAINFO, cainfo);
+            } else {
+#ifdef _WIN32
+                snprintf(cainfo, sizeof(cainfo), "%s\\ca-bundle.crt", root ? root : ".");
+#else
+                snprintf(cainfo, sizeof(cainfo), "%s/ca-bundle.crt", root ? root : ".");
+#endif
+                if (aura_fs_file_exists(cainfo))
+                    curl_easy_setopt(curl, CURLOPT_CAINFO, cainfo);
+            }
+        }
 
         res = curl_easy_perform(curl);
         

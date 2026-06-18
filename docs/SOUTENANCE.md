@@ -44,14 +44,15 @@
 **Flux IA** : `soumettre_reponse()` → JSON → Groq → `parse_ai_response()` → `parse_score_from_feedback()`
 
 ### Slide 6 — Demo live (2 min)
-- Lancer `bin\bin\AURA.exe`
+- Lancer **`AURA.bat`** (ou `launch_aura.ps1`)
 - Connexion → Lancer entretien → repondre → score affiche
 - Montrer Rapports / Classement / Profil
+- Si crash : `AURA.bat /debug` pour voir les erreurs
 
 ### Slide 7 — Pipeline & deploiement (1 min)
 - Dev : MSYS2 + `build.ps1`
 - Tests : `tests/test_api.c` + GitHub Actions
-- Package : `AURA/` + distribution Itch.io
+- Package : `scripts\package_release.ps1` → `AURA-ESISA.zip`
 
 ### Slide 8 — Limites & perspectives (30 s)
 - Dependance API Groq (fallback local)

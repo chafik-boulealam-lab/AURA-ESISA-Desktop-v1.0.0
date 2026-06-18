@@ -26,3 +26,15 @@ foreach ($d in $dlls) {
     }
 }
 Write-Host "DLLs copies: $copied -> $dest"
+
+$caSources = @(
+    "C:\msys64\mingw64\etc\ssl\certs\ca-bundle.crt",
+    "C:\msys64\mingw64\ssl\certs\ca-bundle.crt"
+)
+foreach ($ca in $caSources) {
+    if (Test-Path $ca) {
+        Copy-Item $ca (Join-Path $dest "cacert.pem") -Force
+        Write-Host "CA bundle: cacert.pem -> $dest"
+        break
+    }
+}

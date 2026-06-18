@@ -178,14 +178,7 @@ bool aura_assets_exists(const char *asset_name) {
 bool aura_assets_verify_critical(void) {
     printf("[AURA] Verifying critical assets...\n");
     
-    // Define critical assets required for the application
-    const char *critical_assets[] = {
-        // Add critical assets here as your project grows
-        // Example: "images/logo.png", "fonts/main.ttf"
-        NULL  // Null terminator
-    };
-    
-    // For now, just verify the asset directories exist
+    // Verify the asset directories exist
     const char *required_dirs[] = {
         "images", "sounds", "fonts", "animations", NULL
     };
