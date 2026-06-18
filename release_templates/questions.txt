@@ -1,0 +1,4 @@
+# Questions placeholder
+What is the difference between a stack and a queue?
+Explain merge sort briefly.
+Describe TCP vs UDP differences.

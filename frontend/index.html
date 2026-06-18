@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA Frontend</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>AURA Frontend (UI Only)</h1>
+    <p class="subtitle">All logic runs in backend C server via HTTP/JSON.</p>
+
+    <section class="card">
+      <h2>Auth</h2>
+      <div class="row">
+        <input id="email" placeholder="gmail@example.com" />
+        <input id="password" type="password" placeholder="password" />
+      </div>
+      <div class="row">
+        <button id="btnRegister">Register</button>
+        <button id="btnLogin">Login</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Tasks</h2>
+      <div class="row">
+        <input id="taskTitle" placeholder="new task" />
+        <button id="btnAddTask">Add Task</button>
+        <button id="btnLoadTasks">Load Tasks</button>
+      </div>
+      <ul id="tasks"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Notes</h2>
+      <div class="row">
+        <input id="noteContent" placeholder="new note" />
+        <button id="btnAddNote">Add Note</button>
+        <button id="btnLoadNotes">Load Notes</button>
+      </div>
+      <ul id="notes"></ul>
+    </section>
+
+    <section class="card">
+      <h2>AI</h2>
+      <div class="row">
+        <input id="prompt" placeholder="ask AI" />
+        <button id="btnAskAI">Ask</button>
+      </div>
+      <pre id="aiReply"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Server Response</h2>
+      <pre id="output"></pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

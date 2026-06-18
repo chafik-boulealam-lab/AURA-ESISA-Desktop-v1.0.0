@@ -1,0 +1,2 @@
+# Scores file - placeholder
+# name|score|category|timestamp

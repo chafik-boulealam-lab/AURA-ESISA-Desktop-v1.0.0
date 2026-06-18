@@ -1,0 +1,19 @@
+id,domain,level,text,answer
+1,Architecture des ordinateurs,Junior,Quelle est la difference entre la RAM et le disque dur?,La RAM est volatile et rapide; le disque est persistant.
+2,Architecture des ordinateurs,Junior,Que signifie CPU et quel est son role?,Central Processing Unit - execute les instructions.
+3,Architecture des ordinateurs,Intermediate,Expliquez le cycle Fetch-Decode-Execute.,Le CPU charge une instruction la decode puis l'execute.
+4,Architecture des ordinateurs,Intermediate,Qu'est-ce qu'un registre processeur?,Petite memoire ultra-rapide dans le CPU.
+5,Architecture des ordinateurs,Advanced,Comparez Harvard et Von Neumann.,Harvard separe bus instructions/donnees; Von Neumann les partage.
+6,Architecture des ordinateurs,Expert,Qu'est-ce que le pipeline et ses hazards?,Execution par etapes; hazards = conflits de dependances.
+7,Algorithmique,Junior,Quelle est la complexite de la recherche lineaire?,O(n)
+8,Algorithmique,Junior,Qu'est-ce qu'une pile (stack)?,Structure LIFO dernier entre premier sorti.
+9,Algorithmique,Intermediate,Expliquez la difference entre DFS et BFS.,DFS profondeur d'abord BFS largeur d'abord.
+10,Algorithmique,Intermediate,Quelle est la complexite du tri fusion?,O(n log n)
+11,Algorithmique,Advanced,Qu'est-ce que la programmation dynamique?,Resolution par sous-problemes avec memoisation.
+12,Algorithmique,Expert,Expliquez Dijkstra et ses limites.,Plus court chemin; ne fonctionne pas avec poids negatifs.
+13,Programmation C,Junior,Quelle est la difference entre int et float?,int entier float nombre a virgule.
+14,Programmation C,Junior,Qu'est-ce qu'un pointeur en C?,Variable contenant l'adresse memoire d'une autre variable.
+15,Programmation C,Intermediate,Expliquez malloc et free.,Allocation et liberation dynamique de memoire.
+16,Programmation C,Intermediate,Quelle est la difference entre struct et union?,struct stocke tous les champs union partage la meme zone memoire.
+17,Programmation C,Advanced,Qu'est-ce qu'une fuite memoire et comment l'eviter?,Memoire non liberee; toujours free apres malloc.
+18,Programmation C,Expert,Expliquez le comportement indefini en C.,Comportement non specifie par la norme (ex: depassement de tableau).

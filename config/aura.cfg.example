@@ -1,0 +1,7 @@
+# Copiez ce fichier vers bin/bin/config/aura.cfg et ajoutez votre cle Groq
+# https://console.groq.com
+groq_api_key =
+
+window_width = 1280
+window_height = 800
+theme = dark

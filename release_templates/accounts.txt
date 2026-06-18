@@ -1,0 +1,3 @@
+# Default accounts
+admin:password
+user:guest

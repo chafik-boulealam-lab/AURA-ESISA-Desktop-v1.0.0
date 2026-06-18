@@ -1,0 +1,37 @@
+# Secrets — ne jamais committer
+bin/bin/config/aura.cfg
+config/aura.cfg
+.env
+*.log
+
+# Build
+obj/
+bin/AURA.exe
+bin/bin/AURA.exe
+bin/bin/*.dll
+bin/bin/lib*.dll
+tests/test_api.exe
+tests/qb_test.exe
+
+# Backend binaires
+backend/server.exe
+backend/data/app.db
+
+# Données locales utilisateur
+data/local.db
+data/reports/
+bin/bin/data/local.db
+bin/bin/data/reports/
+
+# Archives / binaires packagés
+*.zip
+test_*.exe
+test_*.txt
+aura_*.log
+login_screen_debug.log
+runlog.txt
+run_utf8.log
+
+# OS
+Thumbs.db
+.DS_Store
